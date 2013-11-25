@@ -13,7 +13,6 @@ typedef struct
 {
     ngx_int_t test_num;
     ngx_str_t test_str;
-    ngx_int_t repeat;
 }ngx_http_mytest_conf_t;
 
 static char* ngx_http_mytest(ngx_conf_t *cf,ngx_command_t *cmd,void *conf);
@@ -22,15 +21,15 @@ static void* ngx_http_mytest_create_loc_conf(ngx_conf_t *cf);
 static ngx_command_t ngx_http_mytest_commands[] = {
     {
         ngx_string("mytest"),
-        NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF,
+        NGX_HTTP_LOC_CONF | NGX_CONF_NOARGS,
         ngx_http_mytest,
         NGX_HTTP_LOC_CONF_OFFSET,
-        offsetof(ngx_http_mytest_conf_t,repeat),
+		0,
         NULL
     },
     {
         ngx_string("test_num"),
-        NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF,
+        NGX_HTTP_LOC_CONF | NGX_CONF_TAKE1,
         ngx_conf_set_num_slot,
         NGX_HTTP_LOC_CONF_OFFSET,
         offsetof(ngx_http_mytest_conf_t,test_num),
@@ -38,7 +37,7 @@ static ngx_command_t ngx_http_mytest_commands[] = {
     },
     {
         ngx_string("test_str"),
-        NGX_HTTP_MAIN_CONF | NGX_HTTP_SRV_CONF | NGX_HTTP_LOC_CONF,
+        NGX_CONF_TAKE1 | NGX_HTTP_LOC_CONF,
         ngx_conf_set_str_slot,
         NGX_HTTP_LOC_CONF_OFFSET,
         offsetof(ngx_http_mytest_conf_t,test_str),
@@ -79,22 +78,7 @@ static char* ngx_http_mytest(ngx_conf_t *cf,ngx_command_t *cmd,void *conf)
     clcf = ngx_http_conf_get_module_loc_conf(cf,ngx_http_core_module);
     clcf->handler = ngx_http_mytest_handler;
 
-  ngx_http_mytest_conf_t *mycf = (ngx_http_mytest_conf_t *)conf;
-  ngx_str_t *value = cf->args->elts;
-  if (cf->args->nelts == 1)
-  {
-    mycf->repeat = ngx_atoi(value[1].data,value[1].len);
-    if (mycf->repeat == NGX_ERROR)
-    {
-        return "invalid repeat num";
-    }
-  }
-  else
-  {
-    return "invalid repeat num";
-  }
-
-  return NGX_CONF_OK;
+    return NGX_CONF_OK;
 }
 
 static ngx_int_t ngx_http_mytest_handler(ngx_http_request_t *rq)
