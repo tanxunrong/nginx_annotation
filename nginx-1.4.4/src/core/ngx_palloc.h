@@ -47,8 +47,8 @@ struct ngx_pool_large_s {
 
 
 typedef struct {
-    u_char               *last;
-    u_char               *end;
+    u_char               *last; //可用内存起始位置
+    u_char               *end;//结束位置
     ngx_pool_t           *next;
     ngx_uint_t            failed;
 } ngx_pool_data_t;
@@ -56,10 +56,10 @@ typedef struct {
 
 struct ngx_pool_s {
     ngx_pool_data_t       d;
-    size_t                max;
+    size_t                max; // size - sizeof(self)和最大值中的较小值
     ngx_pool_t           *current;
     ngx_chain_t          *chain;
-    ngx_pool_large_t     *large;
+    ngx_pool_large_t     *large; //large链表最多挂载3个大块内存,否则将从头部插入个large
     ngx_pool_cleanup_t   *cleanup;
     ngx_log_t            *log;
 };
@@ -79,10 +79,11 @@ ngx_pool_t *ngx_create_pool(size_t size, ngx_log_t *log);
 void ngx_destroy_pool(ngx_pool_t *pool);
 void ngx_reset_pool(ngx_pool_t *pool);
 
-void *ngx_palloc(ngx_pool_t *pool, size_t size);
-void *ngx_pnalloc(ngx_pool_t *pool, size_t size);
-void *ngx_pcalloc(ngx_pool_t *pool, size_t size);
+void *ngx_palloc(ngx_pool_t *pool, size_t size); //对齐
+void *ngx_pnalloc(ngx_pool_t *pool, size_t size); //不对齐
+void *ngx_pcalloc(ngx_pool_t *pool, size_t size); //对齐，清0
 void *ngx_pmemalign(ngx_pool_t *pool, size_t size, size_t alignment);
+//在large链表中遍历寻找相同地址释放相应large中的alloc
 ngx_int_t ngx_pfree(ngx_pool_t *pool, void *p);
 
 

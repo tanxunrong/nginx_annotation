@@ -124,7 +124,11 @@ ngx_palloc(ngx_pool_t *pool, size_t size)
         p = pool->current;
 
         do {
+			//对齐
             m = ngx_align_ptr(p->d.last, NGX_ALIGNMENT);
+			//从last开始取出m大小的一段内存
+			//并且将last指针后移
+			
 
             if ((size_t) (p->d.end - m) >= size) {
                 p->d.last = m + size;
@@ -132,6 +136,7 @@ ngx_palloc(ngx_pool_t *pool, size_t size)
                 return m;
             }
 
+			//链表下一个ngx_pool_t
             p = p->d.next;
 
         } while (p);
