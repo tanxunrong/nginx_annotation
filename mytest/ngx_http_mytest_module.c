@@ -95,8 +95,8 @@ static ngx_int_t ngx_http_mytest_handler(ngx_http_request_t *rq)
         return rc;
     }
 
-    ngx_str_t type = ngx_string("test/plain");
-    ngx_str_t response = ngx_string("Hello World!");
+    ngx_str_t type = ngx_string("test/html");
+    ngx_str_t response = ngx_string("<h1>Hello World!</h1>");
     rq->headers_out.status = NGX_HTTP_OK;
     rq->headers_out.content_length_n = response.len;
     rq->headers_out.content_type = type;
